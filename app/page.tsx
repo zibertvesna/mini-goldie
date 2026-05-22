@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from "../lib/firestore";
 
@@ -10,7 +13,7 @@ export default function Home() {
   const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(false);
 
-  const [selectedDay, setSelectedDay] = useState("1");
+  const [date, setDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [name, setName] = useState("");
 
@@ -41,7 +44,7 @@ export default function Home() {
 
     await addDoc(collection(db, "appointments"), {
       name,
-      day: selectedDay,
+      date: date.toDateString(),
       time: selectedTime,
     });
 
@@ -59,7 +62,7 @@ export default function Home() {
   if (!unlocked) {
     return (
       <main style={styles.screen}>
-        <div style={styles.box}>
+        <div style={styles.card}>
           <h2>💅 Goldie</h2>
 
           <input
@@ -71,7 +74,7 @@ export default function Home() {
           />
 
           <button onClick={login} style={styles.button}>
-            Login
+            Odkleni
           </button>
         </div>
       </main>
@@ -82,42 +85,31 @@ export default function Home() {
     <main style={styles.screen}>
       <div style={styles.app}>
 
-        <h2>📅 Booking</h2>
+        <h2>📅 Celoletni koledar</h2>
 
-        {/* DAYS */}
-        <div style={styles.grid}>
-          {Array.from({ length: 31 }, (_, i) => {
-            const d = String(i + 1);
-
-            return (
-              <button
-                key={d}
-                onClick={() => setSelectedDay(d)}
-                style={{
-                  ...styles.day,
-                  background: selectedDay === d ? "#ff4da6" : "#eee",
-                  color: selectedDay === d ? "#fff" : "#000",
-                }}
-              >
-                {d}
-              </button>
-            );
-          })}
-        </div>
+        {/* REAL CALENDAR */}
+        <Calendar
+          onChange={(value: any) => setDate(value)}
+          value={date}
+          minDetail="month"
+          maxDetail="year"
+        />
 
         {/* NAME */}
         <input
-          placeholder="Ime"
+          placeholder="Ime stranke"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={styles.input}
         />
 
         {/* TIMES */}
-        <div style={styles.timeGrid}>
+        <div style={styles.times}>
           {times.map((t) => {
             const isTaken = appointments.some(
-              (a) => a.day === selectedDay && a.time === t
+              (a) =>
+                a.date === date.toDateString() &&
+                a.time === t
             );
 
             return (
@@ -151,23 +143,23 @@ export default function Home() {
   );
 }
 
-/* STYLES — SAFE VERSION (NO TYPE ERRORS) */
-const styles = {
+/* STYLES */
+const styles: any = {
   screen: {
     minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
     fontFamily: "Arial",
     background: "#fff",
   },
 
-  box: {
+  card: {
     marginTop: 120,
     padding: 20,
     width: 260,
     background: "#f5f5f5",
     borderRadius: 16,
+    textAlign: "center",
   },
 
   app: {
@@ -190,20 +182,7 @@ const styles = {
     borderRadius: 10,
   },
 
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(7,1fr)",
-    gap: 6,
-    marginBottom: 10,
-  },
-
-  day: {
-    padding: 10,
-    border: "none",
-    borderRadius: 10,
-  },
-
-  timeGrid: {
+  times: {
     display: "grid",
     gridTemplateColumns: "repeat(3,1fr)",
     gap: 6,
