@@ -23,4 +23,23 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}.react-calendar {
+  width: 100%;
+  border: none;
+  font-family: Arial;
+}
+
+.react-calendar__month-view__days__day {
+  color: black;
+  padding: 10px;
+}
+
+.react-calendar__tile {
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.react-calendar__tile--active {
+  background: #ff4da6 !important;
+  color: white !important;
 }
