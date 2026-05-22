@@ -16,6 +16,7 @@ export default function Home() {
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
+  /* FIREBASE */
   useEffect(() => {
     if (!unlocked) return;
 
@@ -28,11 +29,13 @@ export default function Home() {
     return () => unsub();
   }, [unlocked]);
 
+  /* LOGIN */
   const login = () => {
     if (pin === PIN) setUnlocked(true);
     else alert("Wrong PIN");
   };
 
+  /* BOOK */
   const book = async () => {
     if (!name || !selectedTime) return;
 
@@ -79,7 +82,7 @@ export default function Home() {
     <main style={styles.screen}>
       <div style={styles.app}>
 
-        <h2>📅 Calendar</h2>
+        <h2>📅 Booking</h2>
 
         {/* DAYS */}
         <div style={styles.days}>
@@ -102,8 +105,9 @@ export default function Home() {
           })}
         </div>
 
+        {/* NAME */}
         <input
-          placeholder="Name"
+          placeholder="Ime"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={styles.input}
@@ -112,18 +116,18 @@ export default function Home() {
         {/* TIMES */}
         <div style={styles.times}>
           {times.map((t) => {
-            const taken = appointments.some(
+            const isTaken = appointments.some(
               (a) => a.day === selectedDay && a.time === t
             );
 
             return (
               <button
                 key={t}
-                disabled={taken}
+                disabled={isTaken}
                 onClick={() => setSelectedTime(t)}
                 style={{
                   ...styles.time,
-                  background: taken
+                  background: isTaken
                     ? "#ccc"
                     : selectedTime === t
                     ? "#ff4da6"
@@ -137,8 +141,9 @@ export default function Home() {
           })}
         </div>
 
+        {/* SAVE */}
         <button onClick={book} style={styles.save}>
-          Save appointment
+          Shrani termin
         </button>
 
       </div>
@@ -146,6 +151,7 @@ export default function Home() {
   );
 }
 
+/* STYLES (SAFE - NO TYPESCRIPT ERROR) */
 const styles: any = {
   screen: {
     minHeight: "100vh",
@@ -154,6 +160,7 @@ const styles: any = {
     fontFamily: "Arial",
     background: "#fff",
   },
+
   card: {
     marginTop: 120,
     padding: 20,
@@ -162,15 +169,18 @@ const styles: any = {
     borderRadius: 16,
     textAlign: "center",
   },
+
   app: {
     width: 380,
     padding: 16,
   },
+
   input: {
     width: "100%",
     padding: 10,
     margin: "10px 0",
   },
+
   button: {
     width: "100%",
     padding: 12,
@@ -179,28 +189,33 @@ const styles: any = {
     border: "none",
     borderRadius: 10,
   },
+
   days: {
     display: "grid",
     gridTemplateColumns: "repeat(7,1fr)",
     gap: 6,
     marginBottom: 10,
   },
+
   day: {
     padding: 10,
     border: "none",
     borderRadius: 10,
   },
+
   times: {
     display: "grid",
     gridTemplateColumns: "repeat(3,1fr)",
     gap: 6,
     marginTop: 10,
   },
+
   time: {
     padding: 10,
     border: "none",
     borderRadius: 10,
   },
+
   save: {
     width: "100%",
     padding: 12,
