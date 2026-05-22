@@ -9,6 +9,28 @@ import { db } from "../lib/firestore";
 
 const PIN = "1234";
 
+/* INLINE CSS FIX (fixes invisible dates issue) */
+const calendarFix = `
+.react-calendar {
+  width: 100%;
+  border: none;
+  font-family: Arial;
+}
+
+.react-calendar button {
+  color: black;
+}
+
+.react-calendar__tile {
+  padding: 10px;
+}
+
+.react-calendar__tile--active {
+  background: #ff4da6 !important;
+  color: white !important;
+}
+`;
+
 export default function Home() {
   const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(false);
@@ -19,7 +41,6 @@ export default function Home() {
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
-  /* FIREBASE LIVE DATA */
   useEffect(() => {
     if (!unlocked) return;
 
@@ -32,13 +53,11 @@ export default function Home() {
     return () => unsub();
   }, [unlocked]);
 
-  /* LOGIN */
   const login = () => {
     if (pin === PIN) setUnlocked(true);
     else alert("Wrong PIN");
   };
 
-  /* BOOK */
   const book = async () => {
     if (!name || !selectedTime) return;
 
@@ -53,10 +72,23 @@ export default function Home() {
   };
 
   const times = [
-    "09:00","09:30","10:00","10:30",
-    "11:00","11:30","12:00","12:30",
-    "13:00","13:30","14:00","14:30",
-    "15:00","15:30","16:00","16:30",
+    "06:00","06:30",
+    "07:00","07:30",
+    "08:00","08:30",
+    "09:00","09:30",
+    "10:00","10:30",
+    "11:00","11:30",
+    "12:00","12:30",
+    "13:00","13:30",
+    "14:00","14:30",
+    "15:00","15:30",
+    "16:00","16:30",
+    "17:00","17:30",
+    "18:00","18:30",
+    "19:00","19:30",
+    "20:00","20:30",
+    "21:00","21:30",
+    "22:00"
   ];
 
   if (!unlocked) {
@@ -85,9 +117,10 @@ export default function Home() {
     <main style={styles.screen}>
       <div style={styles.app}>
 
+        <style>{calendarFix}</style>
+
         <h2>📅 Celoletni koledar</h2>
 
-        {/* REAL CALENDAR */}
         <Calendar
           onChange={(value: any) => setDate(value)}
           value={date}
@@ -95,7 +128,6 @@ export default function Home() {
           maxDetail="year"
         />
 
-        {/* NAME */}
         <input
           placeholder="Ime stranke"
           value={name}
@@ -103,7 +135,6 @@ export default function Home() {
           style={styles.input}
         />
 
-        {/* TIMES */}
         <div style={styles.times}>
           {times.map((t) => {
             const isTaken = appointments.some(
@@ -133,7 +164,6 @@ export default function Home() {
           })}
         </div>
 
-        {/* SAVE */}
         <button onClick={book} style={styles.saveBtn}>
           Shrani termin
         </button>
@@ -143,7 +173,6 @@ export default function Home() {
   );
 }
 
-/* STYLES */
 const styles: any = {
   screen: {
     minHeight: "100vh",
