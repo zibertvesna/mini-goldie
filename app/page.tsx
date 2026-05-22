@@ -16,6 +16,7 @@ const services = [
   { name: "Manikura", price: 40, color: "#00c2ff" }
 ];
 
+/* CALENDAR FIX */
 const calendarFix = `
 .react-calendar {
   width: 100%;
@@ -38,12 +39,13 @@ export default function Home() {
   const [unlocked, setUnlocked] = useState(false);
 
   const [date, setDate] = useState(new Date());
-  const [selectedTime, setSelectedTime] = useState("");
+  const [time, setTime] = useState("");
   const [name, setName] = useState("");
   const [service, setService] = useState<any>(null);
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
+  /* LIVE DATA */
   useEffect(() => {
     if (!unlocked) return;
 
@@ -62,47 +64,37 @@ export default function Home() {
   };
 
   const book = async () => {
-    if (!name || !selectedTime || !service) return;
+    if (!name || !time || !service) return;
 
     await addDoc(collection(db, "appointments"), {
       name,
       date: date.toDateString(),
-      time: selectedTime,
+      time,
       service: service.name,
       price: service.price,
       color: service.color
     });
 
     setName("");
-    setSelectedTime("");
+    setTime("");
     setService(null);
   };
 
   const times = [
-    "06:00","06:30",
-    "07:00","07:30",
-    "08:00","08:30",
-    "09:00","09:30",
-    "10:00","10:30",
-    "11:00","11:30",
-    "12:00","12:30",
-    "13:00","13:30",
-    "14:00","14:30",
-    "15:00","15:30",
-    "16:00","16:30",
-    "17:00","17:30",
-    "18:00","18:30",
-    "19:00","19:30",
-    "20:00","20:30",
-    "21:00","21:30",
-    "22:00"
+    "06:00","06:30","07:00","07:30","08:00","08:30",
+    "09:00","09:30","10:00","10:30","11:00","11:30",
+    "12:00","12:30","13:00","13:30","14:00","14:30",
+    "15:00","15:30","16:00","16:30","17:00","17:30",
+    "18:00","18:30","19:00","19:30","20:00","20:30",
+    "21:00","21:30","22:00"
   ];
 
+  /* LOGIN SCREEN */
   if (!unlocked) {
     return (
       <main style={styles.screen}>
         <div style={styles.card}>
-          <h2>💅 Goldie</h2>
+          <h2>💅 SALON PRO</h2>
 
           <input
             type="password"
@@ -113,12 +105,18 @@ export default function Home() {
           />
 
           <button onClick={login} style={styles.button}>
-            Odkleni
+            Enter
           </button>
         </div>
       </main>
     );
   }
+
+  /* REVENUE */
+  const totalRevenue = appointments.reduce(
+    (sum, a) => sum + (a.price || 0),
+    0
+  );
 
   return (
     <main style={styles.screen}>
@@ -126,16 +124,18 @@ export default function Home() {
 
         <style>{calendarFix}</style>
 
-        <h2>📅 Salon booking</h2>
+        <h2>💄 Salon Dashboard</h2>
 
-        <Calendar
-          onChange={(value: any) => setDate(value)}
-          value={date}
-        />
+        {/* REVENUE DASHBOARD */}
+        <div style={styles.dashboard}>
+          💰 Skupaj: {totalRevenue}€
+        </div>
+
+        {/* CALENDAR */}
+        <Calendar onChange={(v: any) => setDate(v)} value={date} />
 
         {/* SERVICES */}
-        <h3>💄 Storitve</h3>
-
+        <h3>Storitve</h3>
         <div style={styles.services}>
           {services.map((s) => (
             <button
@@ -154,7 +154,7 @@ export default function Home() {
 
         {/* NAME */}
         <input
-          placeholder="Ime stranke"
+          placeholder="Stranka"
           value={name}
           onChange={(e) => setName(e.target.value)}
           style={styles.input}
@@ -163,25 +163,22 @@ export default function Home() {
         {/* TIMES */}
         <div style={styles.times}>
           {times.map((t) => {
-            const isTaken = appointments.some(
-              (a) =>
-                a.date === date.toDateString() &&
-                a.time === t
+            const taken = appointments.some(
+              (a) => a.date === date.toDateString() && a.time === t
             );
 
             return (
               <button
                 key={t}
-                disabled={isTaken}
-                onClick={() => setSelectedTime(t)}
+                disabled={taken}
+                onClick={() => setTime(t)}
                 style={{
                   ...styles.timeBtn,
-                  background: isTaken
+                  background: taken
                     ? "#ccc"
-                    : selectedTime === t
+                    : time === t
                     ? "#ff4da6"
                     : "#f5f5f5",
-                  color: selectedTime === t ? "#fff" : "#000",
                 }}
               >
                 {t}
@@ -190,8 +187,8 @@ export default function Home() {
           })}
         </div>
 
-        <button onClick={book} style={styles.saveBtn}>
-          Shrani termin
+        <button onClick={book} style={styles.save}>
+          Shrani
         </button>
 
       </div>
@@ -199,6 +196,7 @@ export default function Home() {
   );
 }
 
+/* STYLES */
 const styles: any = {
   screen: {
     minHeight: "100vh",
@@ -218,8 +216,17 @@ const styles: any = {
   },
 
   app: {
-    width: 380,
+    width: "100%",
+    maxWidth: 420,
     padding: 16,
+  },
+
+  dashboard: {
+    padding: 10,
+    background: "#000",
+    color: "#fff",
+    borderRadius: 10,
+    marginBottom: 10,
   },
 
   input: {
@@ -240,7 +247,6 @@ const styles: any = {
   services: {
     display: "grid",
     gap: 6,
-    marginBottom: 10,
   },
 
   serviceBtn: {
@@ -262,7 +268,7 @@ const styles: any = {
     borderRadius: 10,
   },
 
-  saveBtn: {
+  save: {
     width: "100%",
     padding: 12,
     marginTop: 10,
