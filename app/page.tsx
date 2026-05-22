@@ -9,7 +9,13 @@ import { db } from "../lib/firestore";
 
 const PIN = "1234";
 
-/* FIX CALENDAR VISIBILITY */
+/* SERVICES */
+const services = [
+  { name: "Striženje", price: 30, color: "#ff4da6" },
+  { name: "Barvanje", price: 60, color: "#7c4dff" },
+  { name: "Manikura", price: 40, color: "#00c2ff" }
+];
+
 const calendarFix = `
 .react-calendar {
   width: 100%;
@@ -19,10 +25,6 @@ const calendarFix = `
 
 .react-calendar button {
   color: black;
-}
-
-.react-calendar__tile {
-  padding: 10px;
 }
 
 .react-calendar__tile--active {
@@ -38,6 +40,7 @@ export default function Home() {
   const [date, setDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState("");
   const [name, setName] = useState("");
+  const [service, setService] = useState<any>(null);
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
@@ -59,16 +62,20 @@ export default function Home() {
   };
 
   const book = async () => {
-    if (!name || !selectedTime) return;
+    if (!name || !selectedTime || !service) return;
 
     await addDoc(collection(db, "appointments"), {
       name,
       date: date.toDateString(),
       time: selectedTime,
+      service: service.name,
+      price: service.price,
+      color: service.color
     });
 
     setName("");
     setSelectedTime("");
+    setService(null);
   };
 
   const times = [
@@ -119,15 +126,33 @@ export default function Home() {
 
         <style>{calendarFix}</style>
 
-        <h2>📅 Booking</h2>
+        <h2>📅 Salon booking</h2>
 
         <Calendar
           onChange={(value: any) => setDate(value)}
           value={date}
-          minDetail="month"
-          maxDetail="year"
         />
 
+        {/* SERVICES */}
+        <h3>💄 Storitve</h3>
+
+        <div style={styles.services}>
+          {services.map((s) => (
+            <button
+              key={s.name}
+              onClick={() => setService(s)}
+              style={{
+                ...styles.serviceBtn,
+                background: service?.name === s.name ? s.color : "#eee",
+                color: service?.name === s.name ? "#fff" : "#000",
+              }}
+            >
+              {s.name} ({s.price}€)
+            </button>
+          ))}
+        </div>
+
+        {/* NAME */}
         <input
           placeholder="Ime stranke"
           value={name}
@@ -135,6 +160,7 @@ export default function Home() {
           style={styles.input}
         />
 
+        {/* TIMES */}
         <div style={styles.times}>
           {times.map((t) => {
             const isTaken = appointments.some(
@@ -173,30 +199,26 @@ export default function Home() {
   );
 }
 
-/* STYLES - MOBILE FIXED */
 const styles: any = {
   screen: {
     minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center",
     fontFamily: "Arial",
     background: "#fff",
-    padding: 10,
   },
 
   card: {
+    marginTop: 120,
     padding: 20,
-    width: "100%",
-    maxWidth: 300,
+    width: 260,
     background: "#f5f5f5",
     borderRadius: 16,
     textAlign: "center",
   },
 
   app: {
-    width: "100%",
-    maxWidth: 420,
+    width: 380,
     padding: 16,
   },
 
@@ -211,6 +233,18 @@ const styles: any = {
     padding: 12,
     background: "#ff4da6",
     color: "#fff",
+    border: "none",
+    borderRadius: 10,
+  },
+
+  services: {
+    display: "grid",
+    gap: 6,
+    marginBottom: 10,
+  },
+
+  serviceBtn: {
+    padding: 10,
     border: "none",
     borderRadius: 10,
   },
