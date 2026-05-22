@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import React from "react";
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from "../lib/firestore";
 
@@ -11,9 +10,8 @@ export default function Home() {
   const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(false);
 
-  const [selectedDay, setSelectedDay] = useState("22");
+  const [selectedDay, setSelectedDay] = useState("1");
   const [selectedTime, setSelectedTime] = useState("");
-
   const [name, setName] = useState("");
 
   const [appointments, setAppointments] = useState<any[]>([]);
@@ -22,33 +20,18 @@ export default function Home() {
     if (!unlocked) return;
 
     const unsub = onSnapshot(collection(db, "appointments"), (snap) => {
-      setAppointments(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      setAppointments(
+        snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      );
     });
 
     return () => unsub();
   }, [unlocked]);
 
-  if (!unlocked) {
-    return (
-      <main style={screen}>
-        <div style={box}>
-          <h2>💅 Goldie</h2>
-
-          <input
-            type="password"
-            placeholder="PIN"
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            style={input}
-          />
-
-          <button onClick={() => setUnlocked(pin === PIN)} style={btn}>
-            Odkleni
-          </button>
-        </div>
-      </main>
-    );
-  }
+  const login = () => {
+    if (pin === PIN) setUnlocked(true);
+    else alert("Wrong PIN");
+  };
 
   const book = async () => {
     if (!name || !selectedTime) return;
@@ -63,15 +46,43 @@ export default function Home() {
     setSelectedTime("");
   };
 
-  const taken = appointments;
+  const times = [
+    "09:00","09:30","10:00","10:30",
+    "11:00","11:30","12:00","12:30",
+    "13:00","13:30","14:00","14:30",
+    "15:00","15:30","16:00","16:30",
+  ];
+
+  if (!unlocked) {
+    return (
+      <main style={styles.screen}>
+        <div style={styles.card}>
+          <h2>💅 Goldie</h2>
+
+          <input
+            type="password"
+            placeholder="PIN"
+            value={pin}
+            onChange={(e) => setPin(e.target.value)}
+            style={styles.input}
+          />
+
+          <button onClick={login} style={styles.button}>
+            Login
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
-    <main style={screen}>
-      <div style={app}>
+    <main style={styles.screen}>
+      <div style={styles.app}>
 
-        <h2>📅 Booking</h2>
+        <h2>📅 Calendar</h2>
 
-        <div style={grid}>
+        {/* DAYS */}
+        <div style={styles.days}>
           {Array.from({ length: 31 }, (_, i) => {
             const d = String(i + 1);
 
@@ -80,7 +91,7 @@ export default function Home() {
                 key={d}
                 onClick={() => setSelectedDay(d)}
                 style={{
-                  ...day,
+                  ...styles.day,
                   background: selectedDay === d ? "#ff4da6" : "#eee",
                   color: selectedDay === d ? "#fff" : "#000",
                 }}
@@ -92,26 +103,27 @@ export default function Home() {
         </div>
 
         <input
-          placeholder="Ime stranke"
+          placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={input}
+          style={styles.input}
         />
 
-        <div style={timeGrid}>
-          {times.map(t => {
-            const isTaken = taken.some(
-              a => a.day === selectedDay && a.time === t
+        {/* TIMES */}
+        <div style={styles.times}>
+          {times.map((t) => {
+            const taken = appointments.some(
+              (a) => a.day === selectedDay && a.time === t
             );
 
             return (
               <button
                 key={t}
-                disabled={isTaken}
+                disabled={taken}
                 onClick={() => setSelectedTime(t)}
                 style={{
-                  ...timeBtn,
-                  background: isTaken
+                  ...styles.time,
+                  background: taken
                     ? "#ccc"
                     : selectedTime === t
                     ? "#ff4da6"
@@ -125,8 +137,8 @@ export default function Home() {
           })}
         </div>
 
-        <button onClick={book} style={saveBtn}>
-          Shrani termin
+        <button onClick={book} style={styles.save}>
+          Save appointment
         </button>
 
       </div>
@@ -134,89 +146,68 @@ export default function Home() {
   );
 }
 
-/* TIMES */
-const times = [
-  "09:00","09:30",
-  "10:00","10:30",
-  "11:00","11:30",
-  "12:00","12:30",
-  "13:00","13:30",
-  "14:00","14:30",
-  "15:00","15:30",
-  "16:00","16:30",
-];
-
-/* FIXED TYPES 🔥 */
-const screen: React.CSSProperties = {
-  minHeight: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  fontFamily: "Arial",
-  background: "#fff",
-};
-
-const box: React.CSSProperties = {
-  marginTop: 120,
-  padding: 20,
-  width: 260,
-  background: "#f5f5f5",
-  borderRadius: 16,
-  textAlign: "center" as const
-};
-
-const app: React.CSSProperties = {
-  width: 380,
-  padding: 16,
-};
-
-const input: React.CSSProperties = {
-  width: "100%",
-  padding: 10,
-  marginTop: 10,
-  marginBottom: 10,
-};
-
-const btn: React.CSSProperties = {
-  width: "100%",
-  padding: 12,
-  background: "#ff4da6",
-  color: "#fff",
-  border: "none",
-  borderRadius: 10,
-};
-
-const grid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(7,1fr)",
-  gap: 6,
-  marginBottom: 10,
-};
-
-const day: React.CSSProperties = {
-  padding: 10,
-  border: "none",
-  borderRadius: 10,
-};
-
-const timeGrid: React.CSSProperties = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3,1fr)",
-  gap: 6,
-  marginTop: 10,
-};
-
-const timeBtn: React.CSSProperties = {
-  padding: 10,
-  border: "none",
-  borderRadius: 10,
-};
-
-const saveBtn: React.CSSProperties = {
-  width: "100%",
-  padding: 12,
-  marginTop: 10,
-  background: "#ff4da6",
-  color: "#fff",
-  border: "none",
-  borderRadius: 10,
+const styles: any = {
+  screen: {
+    minHeight: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    fontFamily: "Arial",
+    background: "#fff",
+  },
+  card: {
+    marginTop: 120,
+    padding: 20,
+    width: 260,
+    background: "#f5f5f5",
+    borderRadius: 16,
+    textAlign: "center",
+  },
+  app: {
+    width: 380,
+    padding: 16,
+  },
+  input: {
+    width: "100%",
+    padding: 10,
+    margin: "10px 0",
+  },
+  button: {
+    width: "100%",
+    padding: 12,
+    background: "#ff4da6",
+    color: "#fff",
+    border: "none",
+    borderRadius: 10,
+  },
+  days: {
+    display: "grid",
+    gridTemplateColumns: "repeat(7,1fr)",
+    gap: 6,
+    marginBottom: 10,
+  },
+  day: {
+    padding: 10,
+    border: "none",
+    borderRadius: 10,
+  },
+  times: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3,1fr)",
+    gap: 6,
+    marginTop: 10,
+  },
+  time: {
+    padding: 10,
+    border: "none",
+    borderRadius: 10,
+  },
+  save: {
+    width: "100%",
+    padding: 12,
+    marginTop: 10,
+    background: "#ff4da6",
+    color: "#fff",
+    border: "none",
+    borderRadius: 10,
+  },
 };
