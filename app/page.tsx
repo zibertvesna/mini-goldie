@@ -16,7 +16,7 @@ export default function Home() {
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
-  /* FIREBASE */
+  /* FIREBASE LIVE DATA */
   useEffect(() => {
     if (!unlocked) return;
 
@@ -59,7 +59,7 @@ export default function Home() {
   if (!unlocked) {
     return (
       <main style={styles.screen}>
-        <div style={styles.card}>
+        <div style={styles.box}>
           <h2>💅 Goldie</h2>
 
           <input
@@ -85,7 +85,7 @@ export default function Home() {
         <h2>📅 Booking</h2>
 
         {/* DAYS */}
-        <div style={styles.days}>
+        <div style={styles.grid}>
           {Array.from({ length: 31 }, (_, i) => {
             const d = String(i + 1);
 
@@ -114,7 +114,7 @@ export default function Home() {
         />
 
         {/* TIMES */}
-        <div style={styles.times}>
+        <div style={styles.timeGrid}>
           {times.map((t) => {
             const isTaken = appointments.some(
               (a) => a.day === selectedDay && a.time === t
@@ -126,7 +126,7 @@ export default function Home() {
                 disabled={isTaken}
                 onClick={() => setSelectedTime(t)}
                 style={{
-                  ...styles.time,
+                  ...styles.timeBtn,
                   background: isTaken
                     ? "#ccc"
                     : selectedTime === t
@@ -142,7 +142,7 @@ export default function Home() {
         </div>
 
         {/* SAVE */}
-        <button onClick={book} style={styles.save}>
+        <button onClick={book} style={styles.saveBtn}>
           Shrani termin
         </button>
 
@@ -151,23 +151,23 @@ export default function Home() {
   );
 }
 
-/* STYLES (SAFE - NO TYPESCRIPT ERROR) */
-const styles: any = {
+/* STYLES — SAFE VERSION (NO TYPE ERRORS) */
+const styles = {
   screen: {
     minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
     fontFamily: "Arial",
     background: "#fff",
   },
 
-  card: {
+  box: {
     marginTop: 120,
     padding: 20,
     width: 260,
     background: "#f5f5f5",
     borderRadius: 16,
-    textAlign: "center",
   },
 
   app: {
@@ -190,7 +190,7 @@ const styles: any = {
     borderRadius: 10,
   },
 
-  days: {
+  grid: {
     display: "grid",
     gridTemplateColumns: "repeat(7,1fr)",
     gap: 6,
@@ -203,20 +203,20 @@ const styles: any = {
     borderRadius: 10,
   },
 
-  times: {
+  timeGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(3,1fr)",
     gap: 6,
     marginTop: 10,
   },
 
-  time: {
+  timeBtn: {
     padding: 10,
     border: "none",
     borderRadius: 10,
   },
 
-  save: {
+  saveBtn: {
     width: "100%",
     padding: 12,
     marginTop: 10,
