@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import React from "react";
 import { collection, onSnapshot, addDoc } from "firebase/firestore";
 import { db } from "../lib/firestore";
 
@@ -17,7 +18,6 @@ export default function Home() {
 
   const [appointments, setAppointments] = useState<any[]>([]);
 
-  /* FIREBASE LIVE */
   useEffect(() => {
     if (!unlocked) return;
 
@@ -28,7 +28,6 @@ export default function Home() {
     return () => unsub();
   }, [unlocked]);
 
-  /* LOGIN */
   if (!unlocked) {
     return (
       <main style={screen}>
@@ -43,10 +42,7 @@ export default function Home() {
             style={input}
           />
 
-          <button
-            onClick={() => setUnlocked(pin === PIN)}
-            style={btn}
-          >
+          <button onClick={() => setUnlocked(pin === PIN)} style={btn}>
             Odkleni
           </button>
         </div>
@@ -54,7 +50,6 @@ export default function Home() {
     );
   }
 
-  /* BOOK SLOT */
   const book = async () => {
     if (!name || !selectedTime) return;
 
@@ -76,7 +71,6 @@ export default function Home() {
 
         <h2>📅 Booking</h2>
 
-        {/* DAYS */}
         <div style={grid}>
           {Array.from({ length: 31 }, (_, i) => {
             const d = String(i + 1);
@@ -97,7 +91,6 @@ export default function Home() {
           })}
         </div>
 
-        {/* NAME INPUT */}
         <input
           placeholder="Ime stranke"
           value={name}
@@ -105,7 +98,6 @@ export default function Home() {
           style={input}
         />
 
-        {/* TIMES */}
         <div style={timeGrid}>
           {times.map(t => {
             const isTaken = taken.some(
@@ -133,7 +125,6 @@ export default function Home() {
           })}
         </div>
 
-        {/* SAVE */}
         <button onClick={book} style={saveBtn}>
           Shrani termin
         </button>
@@ -155,8 +146,8 @@ const times = [
   "16:00","16:30",
 ];
 
-/* STYLES */
-const screen = {
+/* FIXED TYPES 🔥 */
+const screen: React.CSSProperties = {
   minHeight: "100vh",
   display: "flex",
   justifyContent: "center",
@@ -164,28 +155,28 @@ const screen = {
   background: "#fff",
 };
 
-const box = {
+const box: React.CSSProperties = {
   marginTop: 120,
   padding: 20,
   width: 260,
   background: "#f5f5f5",
   borderRadius: 16,
-  textAlign: "center",
+  textAlign: "center" as const
 };
 
-const app = {
+const app: React.CSSProperties = {
   width: 380,
   padding: 16,
 };
 
-const input = {
+const input: React.CSSProperties = {
   width: "100%",
   padding: 10,
   marginTop: 10,
   marginBottom: 10,
 };
 
-const btn = {
+const btn: React.CSSProperties = {
   width: "100%",
   padding: 12,
   background: "#ff4da6",
@@ -194,33 +185,33 @@ const btn = {
   borderRadius: 10,
 };
 
-const grid = {
+const grid: React.CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(7,1fr)",
   gap: 6,
   marginBottom: 10,
 };
 
-const day = {
+const day: React.CSSProperties = {
   padding: 10,
   border: "none",
   borderRadius: 10,
 };
 
-const timeGrid = {
+const timeGrid: React.CSSProperties = {
   display: "grid",
   gridTemplateColumns: "repeat(3,1fr)",
   gap: 6,
   marginTop: 10,
 };
 
-const timeBtn = {
+const timeBtn: React.CSSProperties = {
   padding: 10,
   border: "none",
   borderRadius: 10,
 };
 
-const saveBtn = {
+const saveBtn: React.CSSProperties = {
   width: "100%",
   padding: 12,
   marginTop: 10,
