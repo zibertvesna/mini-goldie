@@ -9,7 +9,7 @@ import { db } from "../lib/firestore";
 
 const PIN = "1234";
 
-/* INLINE CSS FIX (fixes invisible dates issue) */
+/* FIX CALENDAR VISIBILITY */
 const calendarFix = `
 .react-calendar {
   width: 100%;
@@ -119,7 +119,7 @@ export default function Home() {
 
         <style>{calendarFix}</style>
 
-        <h2>📅 Celoletni koledar</h2>
+        <h2>📅 Booking</h2>
 
         <Calendar
           onChange={(value: any) => setDate(value)}
@@ -173,26 +173,30 @@ export default function Home() {
   );
 }
 
+/* STYLES - MOBILE FIXED */
 const styles: any = {
   screen: {
     minHeight: "100vh",
     display: "flex",
     justifyContent: "center",
+    alignItems: "center",
     fontFamily: "Arial",
     background: "#fff",
+    padding: 10,
   },
 
   card: {
-    marginTop: 120,
     padding: 20,
-    width: 260,
+    width: "100%",
+    maxWidth: 300,
     background: "#f5f5f5",
     borderRadius: 16,
     textAlign: "center",
   },
 
   app: {
-    width: 380,
+    width: "100%",
+    maxWidth: 420,
     padding: 16,
   },
 
